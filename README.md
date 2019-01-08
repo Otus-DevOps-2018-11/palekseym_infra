@@ -84,7 +84,7 @@ default-puma-server  default  INGRESS    1000      tcp:9292        False
 
 ```
 ## Команда для создания инстанса с использованием startup-script
-`gcloud compute instances create reddit-app --boot-disk-size=10GB --zone=europe-west4-c --image-family ubuntu-1604-lts --image-project=ubuntu-os-cloud --machine-type=g1-small --tags puma-server --restart-on-failure --metadata-from-file startup-script=startup_script.sh`
+`gcloud compute instances create reddit-app --boot-disk-size=10GB --zone=europe-west4-c --image-family ubuntu-1604-lts --image-project=ubuntu-os-cloud --machine-type=g1-small --tags puma-server --restart-on-failure --metadata startup-script-url=https://gist.githubusercontent.com/palekseym/6ca75b7d8d04086b5b6f11807f4fcf1f/raw/12100ca1595452c33a4507631b688e6888aef705/startup_script.sh`
 
 Результат
 ```
