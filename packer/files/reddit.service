@@ -1,0 +1,12 @@
+[Unit]
+Description=Reddit
+After=mongod.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/appuser/reddit
+ExecStart=/usr/local/bin/puma --dir /home/appuser/reddit
+
+[Install]
+WantedBy=multi-user.target
+
