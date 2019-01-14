@@ -94,3 +94,11 @@ Created [https://www.googleapis.com/compute/v1/projects/sapient-cycling-225707/z
 NAME        ZONE            MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP   STATUS
 reddit-app  europe-west4-c  g1-small                   10.164.0.2   35.204.21.83  RUNNING
 ```
+
+# ДЗ 5
+# Было сделано
+ - Получены практические навыки работы с packer
+ - Выполнены два задания со звездочкой
+ - Создан шаблон packer для подготовки reddit-base образа. Шаблон находится в файле packer/ubuntu16.json. Чувствительные переменные вынесены в файл переменных packer/variables.json.
+ - Создан шаблон packer для подготовки образа reddit-full на основе образа reddit-base. Шаблон находится в файле packer/immutable.json. Чувствительные переменные вынесены в файл переменных packer/variables-immutable.json. в образе содержится приложение.
+ - Создан скрипт создания виртуально машины config-scripts/create-redditvm.sh
