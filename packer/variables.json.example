@@ -1,0 +1,9 @@
+{
+    "project_id": "sapient-cycling-00000",
+    "source_image_family": "new-1604-lts",
+    "machine_type": "f1-micros",
+    "image_description": "description",
+    "disk_size": "15",
+    "disk_type": "pd-standard",
+    "tags": "any tags"
+}
