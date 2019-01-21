@@ -102,3 +102,73 @@ reddit-app  europe-west4-c  g1-small                   10.164.0.2   35.204.21.83
  - Создан шаблон packer для подготовки reddit-base образа. Шаблон находится в файле packer/ubuntu16.json. Чувствительные переменные вынесены в файл переменных packer/variables.json.
  - Создан шаблон packer для подготовки образа reddit-full на основе образа reddit-base. Шаблон находится в файле packer/immutable.json. Чувствительные переменные вынесены в файл переменных packer/variables-immutable.json. в образе содержится приложение.
  - Создан скрипт создания виртуально машины config-scripts/create-redditvm.sh
+
+# ДЗ 6
+
+## Здание *
+После того как добавили ssh ключ руками через web интерфейс, при выполнении terraform apply обнаружил расхождение с тем состоянием что известно ему и удалил добавленный вручную ключ ssh, чтобы привести состояние к тому что описанного у terraform.
+
+Пример конфигурации для нескольких пользователей через метаданные проекта
+
+```
+resource "google_compute_project_metadata" "ssh-key" {
+  metadata {
+    ssh-keys = "appuser1:${file(var.public_key_path)}appuser2:${file(var.public_key_path)}appuser3:${file(var.public_key_path)}"
+  }
+}
+```
+
+## Здание **
+Настройки балансировщика лежат в файле lb.tf
+При добавлении второго экземпляра копирования методом копирования появляются следующие проблемы:
+ - Затруднительно повторное использование кода
+ - При изменение какого-то параметра придется отдельно вносить изменения в описание каждого ресурса
+ - При копировании получается много излишнего кода
+
+Пример создание экземпляров через задание необходимого количества в переменной
+
+```
+resource "google_compute_instance" "app" {
+  count        = "${var.instance_count}"
+  name         = "${format("reddit-app-%03d", count.index + 1)}"
+  machine_type = "g1-small"
+  zone         = "${var.zone}"
+  tags         = ["reddit-app"]
+
+  provisioner "file" {
+    source      = "files/puma.service"
+    destination = "/tmp/puma.service"
+  }
+
+  provisioner "remote-exec" {
+    script = "files/deploy.sh"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "appuser"
+    agent       = false
+    private_key = "${file(var.private_key_path)}"
+  }
+
+  metadata {
+    ssh-keys = "appuser:${file(var.public_key_path)}"
+  }
+
+  # определение загрузочного диска
+  boot_disk {
+    initialize_params {
+      image = "${var.disk_image}"
+    }
+  }
+
+  # определение сетевого интерфейса
+  network_interface {
+    # сеть, к которой присоединить данный интерфейс
+    network = "default"
+
+    # использовать ephemeral IP для доступа из Интернет
+    access_config {}
+  }
+}
+```
