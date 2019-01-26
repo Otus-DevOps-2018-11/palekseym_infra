@@ -172,3 +172,111 @@ resource "google_compute_instance" "app" {
   }
 }
 ```
+
+# ДЗ 7. Terraform: ресурсы, модули, окружения и работа в команде
+
+## Здание со *
+Для каждого окружения используется свой файл backend.tf размещенный в корне папки окружения
+### Описание для бекенда prod
+
+```
+terraform {
+   backend "gcs"{
+       bucket="alex-terraform-state"
+       prefix = "prod"
+   }
+}
+```
+
+### Описание для бекенда stage
+
+```
+terraform {
+   backend "gcs"{
+       bucket="alex-terraform-state"
+       prefix = "stage"
+   }
+}
+```
+### Расположение состояния
+Терраформ настроен на хранение состояния в удаленном бакете
+Можно убедится, что локально не хранит состояние
+```
+tay@ubuntu:~/repo/palekseym_infra/terraform/stage$ ll
+total 32
+drwxrwxr-x 3 tay tay 4096 Jan 26 05:33 ./
+drwxrwxr-x 7 tay tay 4096 Jan 26 04:57 ../
+-rw-rw-rw- 1 tay tay  106 Jan 26 05:31 backend.tf
+-rw-rw-rw- 1 tay tay  537 Jan 22 08:22 main.tf
+-rw-rw-rw- 1 tay tay   71 Jan 22 08:16 outputs.tf
+drwxr-xr-x 4 tay tay 4096 Jan 26 05:33 .terraform/
+-rw-rw-rw- 1 tay tay  156 Jan 22 08:16 terraform.tfvars
+-rw-rw-rw- 1 tay tay  735 Jan 22 08:16 variables.tf
+```
+
+Но при этом он видит текущее состояние
+
+```
+tay@ubuntu:~/repo/palekseym_infra/terraform/stage$ terraform state list
+module.app.google_compute_address.app_ip
+module.app.google_compute_firewall.firewall_puma
+module.app.google_compute_instance.app
+module.db.google_compute_firewall.firewall_mongo
+module.db.google_compute_instance.db
+module.vpc.google_compute_firewall.firewall_ssh
+```
+
+### Проверка блокировок
+проверить можно запустив `terraform applay` параллельно. в удаленном бакете создаться файл default.tflock и при повторном запуске выпадет ошибка
+```
+tay@ubuntu:~/repo/palekseym_infra/terraform/stage$ terraform apply
+Acquiring state lock. This may take a few moments...
+
+Error: Error locking state: Error acquiring the state lock: writing "gs://alex-terraform-state/stage/default.tflock" failed: googleapi: Error 412: Precondition Failed, conditionNotMet
+Lock Info:
+  ID:        1548510806879323
+  Path:      gs://alex-terraform-state/stage/default.tflock
+  Operation: OperationTypeApply
+  Who:       tay@ubuntu
+  Version:   0.11.11
+  Created:   2019-01-26 13:53:26.74056728 +0000 UTC
+  Info:
+
+
+Terraform acquires a state lock to protect the state from being written
+by multiple users at the same time. Please resolve the issue above and try
+again. For most commands, you can disable locking with the "-lock=false"
+flag, but this is not recommended.
+```
+
+## Задание с **
+### Добавлен provisioner
+Для того чтобы инстансы подымались с приложением были сделаны следующие изменения.
+* пересобран образ reddit-db-base для того чтобы mongo запускалось не на localhost интерфейсе
+* Добавлен код для провижинга в модуль app
+```
+  provisioner "file" {
+    source      = "../modules/app/files/puma.service"
+    destination = "/tmp/puma.service"
+  }
+  # передача ip дареса для подключения к базе данных mongo
+    provisioner "remote-exec" {
+    inline = [
+      "echo 'DATABASE_URL=${var.database_url}' >> ~/db_config"
+    ]
+  }
+# диплой приложения
+  provisioner "remote-exec" {
+    script = "../modules/app/files/deploy.sh"
+  }
+
+
+  connection {
+    type        = "ssh"
+    user        = "appuser"
+    agent       = false
+    private_key = "${file(var.private_key_path)}"
+  }
+```
+* в модуль app добавлены файлы deploy.sh и puma.service
+* передача ip адреса приложению reddit выполнена в момент провижинга app через файл `/home/appuser/db_config` в puma.service добавлена строчка `EnvironmentFile=/home/appuser/db_config`
