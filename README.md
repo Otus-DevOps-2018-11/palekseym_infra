@@ -280,3 +280,42 @@ flag, but this is not recommended.
 ```
 * в модуль app добавлены файлы deploy.sh и puma.service
 * передача ip адреса приложению reddit выполнена в момент провижинга app через файл `/home/appuser/db_config` в puma.service добавлена строчка `EnvironmentFile=/home/appuser/db_config`
+
+# ДЗ 8. Управление конфигурацией. Основные DevOps инструменты. Знакомство с Ansible
+
+## Здание основное
+Создана папка ansable в торой размещены файлы: ansible.cfg, inventory, inventory-script.py, inventory.json, clone.yml, inventory.yml - в них добавлены базовые параметры для работы с серверами appserver и dbserver.
+
+Выполнена прогонка плейбука clone.yml. Внесено изменений не было так как репозиторий на целевом сервере присутствует
+Удалена папка ~/reddit с сервера приложения.
+При повторной прогонке плейбука clone.yml ansible обнаружил что шаг описанные в плейбуке необходимо выполнить так как папки ~/reddit и выполнил необходимые изменения.
+
+```
+tay@ubuntu:~/repo/palekseym_infra/ansible$ ansible app -m command -a 'rm -rf ~/reddit'
+ [WARNING]: Consider using the file module with state=absent rather than running rm.  If you need to use command because file is insufficient you can add warn=False
+to this command task or set command_warnings=False in ansible.cfg to get rid of this message.
+
+appserver | CHANGED | rc=0 >>
+
+
+tay@ubuntu:~/repo/palekseym_infra/ansible$ ansible-playbook clone.yml
+
+PLAY [Clone] ********************************************************************************************************************************************************
+
+TASK [Gathering Facts] **********************************************************************************************************************************************
+ok: [appserver]
+
+TASK [Clone repo] ***************************************************************************************************************************************************
+changed: [appserver]
+
+PLAY RECAP **********************************************************************************************************************************************************
+appserver                  : ok=2    changed=1    unreachable=0    failed=0
+```
+## Задание со *
+
+В файл inventory.json помещена информация об инстансах для динамического инвентори
+Создан скрипт inventory-script.py для использования динамического инвентори в ansible. Через скрипт динамически определяются ip адреса appserver и dbserver существующих в данный момент в состоянии терраформа.
+В вайл ansible.cfg внесены изменения для использования динамичесткой инвентори
+```
+inventory = ./inventory-script.py
+```
