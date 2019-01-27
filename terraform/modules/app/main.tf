@@ -4,29 +4,7 @@ resource "google_compute_instance" "app" {
   zone         = "${var.zone}"
   tags         = ["reddit-app"]
 
-  provisioner "file" {
-    source      = "../modules/app/files/puma.service"
-    destination = "/tmp/puma.service"
-  }
 
-  # передача ip дареса для подключения к базе данных mongo
-  provisioner "remote-exec" {
-    inline = [
-      "echo 'DATABASE_URL=${var.database_url}' >> ~/db_config",
-    ]
-  }
-
-  # диплой приложения
-  provisioner "remote-exec" {
-    script = "../modules/app/files/deploy.sh"
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "appuser"
-    agent       = false
-    private_key = "${file(var.private_key_path)}"
-  }
 
   boot_disk {
     initialize_params {
