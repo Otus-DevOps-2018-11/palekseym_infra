@@ -319,3 +319,43 @@ appserver                  : ok=2    changed=1    unreachable=0    failed=0
 ```
 inventory = ./inventory-script.py
 ```
+# ДЗ 9. Деплой и управление конфигурацией с Ansible
+
+## Задание основное
+### Один плейбук для одного сценария управления всеми хостами
+ - файлы с расширением *.retry исключены из отлеживания гитом
+ - создан один плейбук reddit_app.yml
+ - создан шаблон templates.mongod.conf.j2 для конфигурации mongod
+ - создан unit файл puma.service для приложения
+ - создан шаблон templates/db_config.j2 для конфигурации подключения приложения к базе даных
+ - плейбуке созданы таски, хэндлеры и шаблоны для конфигурирования и диплоя приложения
+
+### Один пплейбук для нескольких сценариев
+ - создан плейбук reddit_app2.yml
+ - один сценарий из reddit_app.yml скопирован в reddit_app2.yml и разбит на несколько сценариев с задачами помеченными тегами app-tag и db-tag
+ - сценарии выполняют свои дейсвия на целевой системе с привилегиями root
+
+### Несколько плейбуков
+ - создан плейбук app.yml для конфигурирования приложения
+ - создан плейбук db.yml для конфигурирования сервера базы данных
+ - создан плейбук deploy.yml для деплоя приложения
+ - файл reddit_app.yml переименован в reddit_app_one_play.yml
+ - файл reddit_app2.yml переименован в reddit_app_multiple_plays.yml
+ - создан плейбук site.yml в котором импортируются плейбуки: app.yml, db.yml, deploy.yml
+
+### Провижинг в Packer
+ - создан плейбук ansible/packer_app.yml для установки ruby и bundler при подготовки образа
+ - создан плейбук ansible/packer_db.yml для установки mongo при подготовки образа
+ - изменены шаблоны packer packer/app.json и packer/db.json для использования провижинга ansible
+ - собраны образа
+ 
+## Задание со *
+ Настроен dynamic inventory через скрипт https://github.com/express42/terraform-ansible-example/tree/master/ansible
+ Используются файлы dynamic_inventory.sh и terraform.py
+ ansible.cfg перенастроен на использование dynamic_inventory.sh
+ плейбуки app.yml, db.yml, deploy.ym скорректированы на использование динамического провижинга. Пришлось к названию групп хостов в плейбуках добавить суфикс dc=
+ ```
+ - name: Configure App
+  hosts: dc=app
+  become: true
+ ```

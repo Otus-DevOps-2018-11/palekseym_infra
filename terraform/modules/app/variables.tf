@@ -10,12 +10,3 @@ variable app_disk_image {
   description = "Disk image for reddit app"
   default     = "reddit-app-base"
 }
-
-variable private_key_path {
-  description = "Private key path"
-}
-
-variable database_url {
-  description = "Ip address database"
-  default     = "127.0.0.1:27017"
-}
