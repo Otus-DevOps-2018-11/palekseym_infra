@@ -4,7 +4,7 @@
 state_file_name="terraform.tfstate"
 
 # fetch current state form s3
-(cd ../terraform/stage && terraform state pull) > ${state_file_name}
+(cd ../../terraform/stage && terraform state pull) > ${state_file_name}
 ./terraform.py ${1} ${2}
 
 rm ${state_file_name}
