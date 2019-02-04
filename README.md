@@ -359,3 +359,31 @@ inventory = ./inventory-script.py
   hosts: dc=app
   become: true
  ```
+
+# ДЗ 10. Ansible: работа с ролями и окружениями
+
+## Задание основное
+### Создание ролей
+ - Созданы роли app и db на основе плейбуков из предыдущего задания
+ - Созданы различные окружения для prod и stage
+   - ansible/environments/prod
+   - ansible/environments/stage
+ - По умолчанию выставлено окружение stage
+ - Созданы переменные групп хостов для stage и прод
+   - environments/prod
+   - environments/stage
+ - Определение переменных перенесено из плейбуков в переменные групп хоств
+ - Файлы с предыдуещей домашней работы перенесены в папку old
+ - Плейбуки перенесены в папку playbooks
+ - Установлена community-роль jdauphant.nginx
+ -Создан файл vault.key для шифрования чувствительной информации в файлах environments/prod/credentials.yml и environments/stage/credentials.yml
+ - Создан плейбук users.yml для добавления пользователей в ситстему
+ - Добавлен вызов роли jdauphant.nginx в плейбук app.yml
+
+## Задание со *
+### Работа с динамическим инвентори
+ - Настроено динамичесткое инвентори. за основу взяты скрипты https://github.com/express42/terraform-ansible-example/tree/master/ansible
+ - С каким окружением работает динамическое инвентори задается в файле ansible.cfg
+```
+inventory = ./environments/stage/dynamic_inventory.sh
+```

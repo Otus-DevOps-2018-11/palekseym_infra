@@ -189,7 +189,7 @@ def ddcloud_server(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -257,7 +257,7 @@ def triton_machine(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -311,7 +311,7 @@ def packet_device(resource, tfvars=None):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -365,7 +365,7 @@ def digitalocean_host(resource, tfvars=None):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -403,7 +403,7 @@ def softlayer_host(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -472,7 +472,7 @@ def openstack_host(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['metadata'].get('role', 'none'))
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -547,7 +547,7 @@ def aws_host(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -624,7 +624,7 @@ def gce_host(resource, module_name):
 
     # groups specific to Mantl
     groups.append('role=' + attrs['metadata'].get('role', 'none'))
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -668,7 +668,7 @@ def vsphere_host(resource, module_name):
         attrs['ansible_ssh_user'] = attrs['metadata']['ssh_user']
 
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -745,7 +745,7 @@ def azure_host(resource, module_name):
 
     # groups specific to mantl
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
@@ -786,7 +786,7 @@ def clc_server(resource, module_name):
     })
 
     groups.append('role=' + attrs['role'])
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
     return name, attrs, groups
 
 
@@ -822,7 +822,7 @@ def ucs_host(resource, module_name):
     groups.append('role=' + attrs['role'])  # .get('role', 'none'))
 
     # groups.append('all:children')
-    groups.append('' + attrs['consul_dc'])
+    groups.append('dc=' + attrs['consul_dc'])
 
     return name, attrs, groups
 
